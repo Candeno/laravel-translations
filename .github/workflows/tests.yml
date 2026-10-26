@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   phpunit:
     name: Laravel ${{ matrix.laravel }}
@@ -13,8 +16,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Every Laravel 11 release has published advisories; the job still checks this package works on it.
           - laravel: 11
             testbench: 9
+            allow-insecure: true
           - laravel: 12
             testbench: 10
           - laravel: 13
@@ -26,6 +31,9 @@ jobs:
           php-version: '8.4'
           extensions: pdo_sqlite
           coverage: none
+      - name: Allow Laravel ${{ matrix.laravel }} releases with advisories
+        if: matrix.allow-insecure
+        run: composer config policy.advisories.block false
       - name: Pin Laravel ${{ matrix.laravel }}
         run: |
           composer require --no-update --no-interaction "illuminate/database:^${{ matrix.laravel }}.0" "illuminate/support:^${{ matrix.laravel }}.0"
