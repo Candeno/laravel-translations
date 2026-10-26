@@ -1,0 +1,34 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  phpunit:
+    name: Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - laravel: 11
+            testbench: 9
+          - laravel: 12
+            testbench: 10
+          - laravel: 13
+            testbench: 11
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite
+          coverage: none
+      - name: Pin Laravel ${{ matrix.laravel }}
+        run: |
+          composer require --no-update --no-interaction "illuminate/database:^${{ matrix.laravel }}.0" "illuminate/support:^${{ matrix.laravel }}.0"
+          composer require --dev --no-update --no-interaction "orchestra/testbench:^${{ matrix.testbench }}.0"
+      - run: composer update --prefer-dist --no-interaction --no-progress
+      - run: composer test

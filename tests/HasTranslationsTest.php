@@ -10,7 +10,6 @@ class HasTranslationsTest extends TestCase
 {
     public function test_it_returns_the_translation_for_the_requested_locale(): void
     {
-        $this->fail('STUB (red phase): the package does not install on Laravel 13');
         $post = Post::create(['title' => 'Raw title']);
         $post->setTranslation('title', 'uk', 'Назва');
 
